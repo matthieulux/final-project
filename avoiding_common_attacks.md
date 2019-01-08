@@ -1,0 +1,1 @@
+This document explains what measures I took to ensure that my contracts are not suscptible to common attacks.
