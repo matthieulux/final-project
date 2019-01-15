@@ -2,14 +2,24 @@ pragma solidity ^0.5.0;
 
 contract Delivery {
 
-  /* set owner */
+  /* Owner of the contract */
   address owner;
+  
+  /* Name of the farm (used for the verification of the provenance)
+
+  Later on this ought to be replaced by a the public key of an RFID tag
+  attached to the basket and compare the hash of that key registered by
+  the seller against the hash of that same key retrieved by the buyer when scanning the basket.
+  */
+  string farmName = "Matt's Organic Delivery Baskets";
+
+  /* List of the buyers */
+  address[16] public buyers;
 
   /* variable to track the most recent sku # */
   uint private skuCount;
 
   // public mapping that maps the SKU (a number) to a basket.
-  //mapping (uint => Item) public items;
   mapping (uint => Basket) public items;
 
   /* enum called State with 4 states
@@ -30,6 +40,7 @@ contract Delivery {
     State state; // status of delivery
     string longitude; // coordinates of the farm
     string latitude;
+    bytes32 provenance; //proof of provenance build from the longitude and latitude set by the seller
     address payable seller;
     address payable buyer; 
   }
@@ -50,7 +61,7 @@ contract Delivery {
     _;
     uint _price = items[_sku].price;
     uint amountToRefund = msg.value - _price;    
-    items[_sku].buyer.transfer(amountToRefund);
+    //items[_sku].buyer.transfer(amountToRefund);
   }
 
   /* Modifiers called to verify different statuses of the basket */
@@ -66,7 +77,7 @@ contract Delivery {
     skuCount = 0;
   }
 
-  function addItem(string memory _name, uint _price) public returns(bool){
+  function addBasket(string memory _name, uint _price) public returns(bool){
     emit ForSale(skuCount);
     items[skuCount] = Basket( {
       name: _name,
@@ -75,6 +86,7 @@ contract Delivery {
       state: State.ForSale,
       longitude: "0",
       latitude: "0",
+      provenance: 0,
       seller: msg.sender,
       buyer: 0x0000000000000000000000000000000000000000});
     skuCount = skuCount + 1;
@@ -84,7 +96,7 @@ contract Delivery {
   /* transfer money to the seller, set the buyer as the person who called this transaction, and set the state
     to Sold. */
 
-  function buyItem(uint sku)
+  function buyBasket(uint sku)
     public
     payable
     forSale(skuCount)
@@ -97,9 +109,22 @@ contract Delivery {
     emit Sold(sku);
   }
 
+  // Retrieving the buyers
+  function getBuyers() public view returns (address[16] memory) {
+    return buyers;
+  }  
+
+  function buy(uint basketId) public returns (uint) {
+    require(basketId >= 0 && basketId <= 3, "This basket does not exist");
+
+    buyers[basketId] = msg.sender;
+
+    return basketId;
+  }
+
   /* Add 2 modifiers to check if the item is sold already, and that the person calling this function
   is the seller. Change the state of the item to shipped. Remember to call the event associated with this function!*/
-  function shipItem(uint sku)
+  function shipBasket(uint sku)
     public
     sold(sku)
     verifyCaller(msg.sender)
@@ -109,7 +134,7 @@ contract Delivery {
   }
 
   /* Marks the basket as received at the end of the delivery */
-  function receiveItem(uint sku)
+  function receiveBasket(uint sku)
     public
     shipped(sku)
     verifyCaller(msg.sender)
@@ -118,15 +143,67 @@ contract Delivery {
     emit Received(sku);
   }
 
-  /* We have these functions completed so we can run tests, just ignore it :) */
-  function fetchItem(uint _sku) public view returns (string memory name, uint sku, uint price, uint state, address seller, address buyer) {
+  // Get the elements of a basket
+  function fetchBasket(uint _sku) public view returns (
+      string memory name,
+      uint sku,
+      uint price,
+      uint state,
+      string memory longitude,
+      string memory latitude,
+      bytes32 provenance,
+      address seller,
+      address buyer)
+  {
     name = items[_sku].name;
     sku = items[_sku].sku;
     price = items[_sku].price;
     state = uint(items[_sku].state);
+    longitude = items[_sku].longitude;
+    latitude = items[_sku].latitude;
+    provenance = items[_sku].provenance;
     seller = items[_sku].seller;
     buyer = items[_sku].buyer;
-    return (name, sku, price, state, seller, buyer);
+    return (name, sku, price, state, longitude, latitude, provenance, seller, buyer);
+  }
+
+  // Proof of Provenance (PoP) section
+  //mapping (bytes32 => bool) private proofs;
+  
+  // store a proof of provenance in the basket
+  function storeProof(uint sku, bytes32 proof) public {
+    items[sku].provenance = proof;
+    //proofs[proof] = true;
+  }
+  
+  // calculate and store the proof of provenance of a basket
+  // NB: only the basket seller can notarize the provenance
+  function notarize(uint sku)
+    public
+    verifyCaller(msg.sender)
+  {
+    bytes32 proof = proofFor(sku);
+    storeProof(sku, proof);
+  }
+  
+  // helper function to get the farm name's sha256
+  // It can be recorded only by the seller but verified by the buyer
+  // for a given sellet all its baskets have the same proof of provenance
+  // which is a hash of the name of the farm where the basket was produced
+  function proofFor(uint sku) view public returns (bytes32) {
+    //return sha256(abi.encodePacked(items[sku].longitude, items[sku].latitude));
+    return sha256(abi.encodePacked(farmName));
+  }
+  
+  // check if the location of a basket has been notarized
+  function checkProvenance(uint sku) view public returns (bool) {
+    bytes32 proof = proofFor(sku);
+    return hasProof(sku, proof);
+  }
+
+  // returns true if proof is stored
+  function hasProof(uint sku, bytes32 proof) view public returns(bool) {
+    return items[sku].provenance == proof;
   }
 
 }

@@ -3,20 +3,21 @@ App = {
   contracts: {},
 
   init: async function() {
-    // Load pets.
-    $.getJSON('../pets.json', function(data) {
-      var petsRow = $('#petsRow');
-      var petTemplate = $('#petTemplate');
+
+    // Load baskets.
+    $.getJSON('../baskets.json', function(data) {
+      var basketsRow = $('#basketsRow');
+      var basketTemplate = $('#basketTemplate');
 
       for (i = 0; i < data.length; i ++) {
-        petTemplate.find('.panel-title').text(data[i].name);
-        petTemplate.find('img').attr('src', data[i].picture);
-        petTemplate.find('.pet-breed').text(data[i].breed);
-        petTemplate.find('.pet-age').text(data[i].age);
-        petTemplate.find('.pet-location').text(data[i].location);
-        petTemplate.find('.btn-adopt').attr('data-id', data[i].id);
+        basketTemplate.find('.panel-title').text(data[i].name);
+        basketTemplate.find('img').attr('src', data[i].picture);
+        basketTemplate.find('.basket-content').text(data[i].content);
+        basketTemplate.find('.basket-provenance').text(data[i].provenance);
+        basketTemplate.find('.basket-price').text(data[i].price);
+        basketTemplate.find('.btn-buy').attr('data-id', data[i].id);
 
-        petsRow.append(petTemplate.html());
+        basketsRow.append(basketTemplate.html());
       }
     });
 
@@ -51,6 +52,7 @@ App = {
 
   initContract: function() {
     
+    /*
     $.getJSON('Adoption.json', function(data) {
       // Get the necessary contract artifact file and instantiate it with truffle-contract
       var AdoptionArtifact = data;
@@ -60,40 +62,58 @@ App = {
       App.contracts.Adoption.setProvider(App.web3Provider);
     
       // Use our contract to retrieve and mark the adopted pets
-      return App.markAdopted();
+      return App.markSold();
+    });
+    */
+
+    $.getJSON('Delivery.json', function(data) {
+      // Get the necessary contract artifact file and instantiate it with truffle-contract
+      var DeliveryArtifact = data;
+      App.contracts.Delivery = TruffleContract(DeliveryArtifact);
+    
+      // Set the provider for our contract
+      App.contracts.Delivery.setProvider(App.web3Provider);
+    
+      // Use our contract to retrieve and mark the baskets sold
+      return App.markSold();
     });
 
     return App.bindEvents();
   },
 
   bindEvents: function() {
-    $(document).on('click', '.btn-adopt', App.handleAdopt);
+    $(document).on('click', '.btn-buy', App.handleBuy);
   },
 
-  markAdopted: function(adopters, account) {
-    var adoptionInstance;
+  markSold: function(buyers, account) {
+    var deliveryInstance;
+    console.log(window.web3.currentProvider);
+    console.log(App.contracts.Delivery);
+    console.log(App.contracts.Delivery.deployed());
+    
+    App.contracts.Delivery.deployed().then(function(instance) {
+      deliveryInstance = instance;
+      console.log(deliveryInstance);
 
-    App.contracts.Adoption.deployed().then(function(instance) {
-      adoptionInstance = instance;
-
-      return adoptionInstance.getAdopters.call();
-    }).then(function(adopters) {
-      for (i = 0; i < adopters.length; i++) {
-        if (adopters[i] !== '0x0000000000000000000000000000000000000000') {
-          $('.panel-pet').eq(i).find('button').text('Success').attr('disabled', true);
+      return deliveryInstance.getBuyers.call();
+    }).then(function(buyers) {
+      for (i = 0; i < buyers.length; i++) {
+        if (buyers[i] !== '0x0000000000000000000000000000000000000000') {
+          $('.panel-basket').eq(i).find('button').text('Success').attr('disabled', true);
         }
       }
     }).catch(function(err) {
       console.log(err.message);
     });
+    
   },
 
-  handleAdopt: function(event) {
+  handleBuy: function(event) {
     event.preventDefault();
 
-    var petId = parseInt($(event.target).data('id'));
+    var basketId = parseInt($(event.target).data('id'));
 
-    var adoptionInstance;
+    var deliveryInstance;
 
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
@@ -102,13 +122,13 @@ App = {
 
       var account = accounts[0];
 
-      App.contracts.Adoption.deployed().then(function(instance) {
-        adoptionInstance = instance;
+      App.contracts.Delivery.deployed().then(function(instance) {
+        deliveryInstance = instance;
 
-        // Execute adopt as a transaction by sending account
-        return adoptionInstance.adopt(petId, {from: account});
+        // Execute purchase as a transaction by sending account
+        return deliveryInstance.buy(basketId, {from: account});
       }).then(function(result) {
-        return App.markAdopted();
+        return App.markSold();
       }).catch(function(err) {
         console.log(err.message);
       });

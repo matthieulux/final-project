@@ -5,7 +5,9 @@ import "truffle/DeployedAddresses.sol";
 import "../contracts/Adoption.sol";
 
 contract TestAdoption {
- // The address of the adoption contract to be tested
+  
+  /*
+  // The address of the adoption contract to be tested
   Adoption adoption = Adoption(DeployedAddresses.Adoption());
 
   // Testing the adopt() function
@@ -35,5 +37,5 @@ contract TestAdoption {
 
  //The expected owner of adopted pet is this contract
   address expectedAdopter = address(this);
-
+  */
 }
