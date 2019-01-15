@@ -4,6 +4,5 @@ var Delivery = artifacts.require("Delivery");
 module.exports = function(deployer) {
   //deployer.deploy(Adoption);
   deployer.deploy(Delivery);
-  //console.log(Adoption);
-  //console.log(Delivery);
+  
 };
