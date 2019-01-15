@@ -6,6 +6,7 @@ This final project models a simple delivery system between a seller of organic v
 
 Payment are accepted in Ether on the platform and automatically triggered upon receipt of the veggie basket.
 
+
 Personas of the DApp are:
 1. Seller of organic veggie baskets
 2. Buyer(s) of the baskets
