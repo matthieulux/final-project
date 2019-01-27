@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>Matt's Organic Delivery Baskets</title>
 
@@ -42,16 +44,87 @@
             <img alt="140x140" data-src="holder.js/140x140" class="img-rounded img-center" style="width: 100%;" src="https://animalso.com/wp-content/uploads/2017/01/Golden-Retriever_6.jpg" data-holder-rendered="true">
             <br/><br/>
             <strong>Content</strong>: <span class="basket-content">All organic seasonal</span><br/>
-            <strong>Provenance</strong>: <span class="basket-provenance">Viltain, UK</span><br/><br/>
-            <strong>Price</strong>: <span class="basket-price">x Ether</span><br/><br/>
-            <button class="btn btn-default btn-buy" type="button" data-id="0">Buy</button>
+            <strong>Provenance</strong>: <span class="basket-provenance">Viltain, UK</span><br/>
+            <!-- <button class="btn btn-default btn-certify" id="btn-certify" type="button" data-id="0">Certify</button><br/><br/>-->
+            <strong>Price</strong>: Ξ <span class="basket-ethprice">x</span><br/>
+            <strong>Price</strong>: Wei <span class="basket-price">x</span><br/>
+            <strong>Proof of Provenance</strong>:
+            <div class="row justify-content-center">
+              <i id="proof" class="" style="font-size:36px;"></i>
+            </div>
+            <span class="basket-proof"></span><br/><br/>
+            <button class="btn btn-default btn-view" id="btn-view" type="button" data-id="0">View</button>
+            <button class="btn btn-default btn-sell" id="btn-sell" type="button" data-id="0">Sell</button>
+            <button class="btn btn-default btn-buy" id="btn-buy" type="button" data-id="0">Buy</button>
+
+          <div class="panel-status">
+              <div class="col-sm-6 col-md-4 col-lg-3"></div>
+                  
+              <panel-status status="1" class="ng-isolate-scope"><div class="row ng-scope" ng-controller="ProductStatusController">
+                  
+                  <button class="btn btn-default btn-ship" type="button" data-id="0">Ship</button>
+            
+                  <button class="btn btn-default btn-receive" type="button" data-id="0">Receive</button>
+                <div class="col-xs-12">
+                  <div class="purchaseOrderMenu">
+                      <h4>Status</h4>
+                      <div class="FOR_SALE">
+                          <span id="FOR_SALE" class="fa fa-circle" ng-class="status>5?'fa-check-circle approve':'fa-circle-o'"> </span> For Sale
+                      </div>
+                      <div class="SOLD">
+                          <span id="SOLD" class="fa fa-circle-o" ng-class="status>6?'fa-check-circle approve':'fa-circle-o'"></span> Sold
+                      </div>
+                      <div class="SHIPPED">
+                          <span id="SHIPPED" class="fa fa-circle-o" ng-class="status>7?'fa-check-circle approve':'fa-circle-o'"></span> Shipped
+                      </div>
+                      <div class="RECEIVED">
+                          <span id="RECEIVED" class="fa fa-circle-o" ng-class="status>8?'fa-check-circle approve':'fa-circle-o'"></span> Received
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </product-status>
+         
           </div>
         </div>
       </div>
     </div>
+    
+    <!--
+    <div class="panel-status">
+        <div class="col-sm-6 col-md-4 col-lg-3">
+            <br/><br/>
+            <button class="btn btn-default btn-ship" type="button" data-id="0">Ship</button>
+            <br/><br/>
+            <button class="btn btn-default btn-receive" type="button" data-id="0">Receive</button>
+        <panel-status status="1" class="ng-isolate-scope"><div class="row ng-scope" ng-controller="ProductStatusController">
+          <div class="col-xs-12">
+            <div class="purchaseOrderMenu">
+                <h4>Status</h4>
+                <div class="FOR_SALE">
+                    <span id="FOR_SALE" class="fa fa-circle" ng-class="status>5?'fa-check-circle approve':'fa-circle-o'"> </span> For Sale
+                </div>
+                <div class="SOLD">
+                    <span id="SOLD" class="fa fa-circle-o" ng-class="status>6?'fa-check-circle approve':'fa-circle-o'"></span> Sold
+                </div>
+                <div class="SHIPPED">
+                    <span id="SHIPPED" class="fa fa-circle-o" ng-class="status>7?'fa-check-circle approve':'fa-circle-o'"></span> Shipped
+                </div>
+                <div class="RECEIVED">
+                    <span id="RECEIVED" class="fa fa-circle-o" ng-class="status>8?'fa-check-circle approve':'fa-circle-o'"></span> Received
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </product-status>
+      -->
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
     <script src="js/web3.min.js"></script>

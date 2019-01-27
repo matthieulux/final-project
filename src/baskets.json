@@ -5,7 +5,7 @@
     "picture": "images/veggie.jpeg",
     "content": "Organic seasonal veggies",
     "provenance": "Lisco, Alabama",
-    "price": "100000000000000000"
+    "price": "1000000000000000"
   },
   {
     "id": 1,
@@ -13,7 +13,7 @@
     "picture": "images/fruit.jpeg",
     "content": "Organic seasonal fruits",
     "provenance": "Toville, West Virginia",
-    "price": "200000000000000000"
+    "price": "2000000000000000"
   },
   {
     "id": 2,
@@ -21,7 +21,7 @@
     "picture": "images/mixed.jpeg",
     "content": "2-in-1 seasonal basket",
     "provenance": "Freeburn, Idaho",
-    "price": "300000000000000000"
+    "price": "3000000000000000"
   },
   {
     "id": 3,
@@ -29,6 +29,6 @@
     "picture": "images/surprise.jpeg",
     "content": "Farmer's seasonal pick",
     "provenance": "Camas, Pennsylvania",
-    "price": "400000000000000000"
+    "price": "4000000000000000"
   }
 ]

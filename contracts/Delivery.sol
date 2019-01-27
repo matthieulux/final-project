@@ -66,7 +66,7 @@ contract Delivery {
 
   /* Modifiers called to verify different statuses of the basket */
   modifier forSale(uint _sku) {require(items[_sku].state == State.ForSale, "Basket for sale"); _;}
-  modifier sold(uint _sku) {require(items[_sku].state == State.Sold, "Basket sold"); _;}
+  modifier sold(uint _sku) {require(items[_sku].state == State.Sold, "Basket is sold"); _;}
   modifier shipped(uint _sku) {require(items[_sku].state == State.Shipped, "Basket shipped"); _;}
   modifier received(uint _sku) {require(items[_sku].state == State.Received, "Basket received"); _;}
 
@@ -77,7 +77,12 @@ contract Delivery {
     skuCount = 0;
   }
 
-  function addBasket(string memory _name, uint _price) public returns(bool){
+  function getOwner() public view returns(address) {
+    /* get the owner attribute */
+    return owner;
+  }
+
+  function addBasket(string memory _name, uint _price) public returns(bool) {
     emit ForSale(skuCount);
     items[skuCount] = Basket( {
       name: _name,
@@ -112,12 +117,16 @@ contract Delivery {
   // Retrieving the buyers
   function getBuyers() public view returns (address[16] memory) {
     return buyers;
-  }  
+  }
 
-  function buy(uint basketId) public returns (uint) {
+  function buy(uint basketId) public payable returns (uint) {
     require(basketId >= 0 && basketId <= 3, "This basket does not exist");
+    require(msg.value >= items[basketId].price, "Not paid enough to buy this basket");
 
     buyers[basketId] = msg.sender;
+
+    // Effect the money transfer
+    buyBasket(basketId);
 
     return basketId;
   }
@@ -165,6 +174,12 @@ contract Delivery {
     seller = items[_sku].seller;
     buyer = items[_sku].buyer;
     return (name, sku, price, state, longitude, latitude, provenance, seller, buyer);
+  }
+
+  // Get the price of a basket
+  function getBasketPrice(uint _sku) public view returns (uint price) {
+    price = items[_sku].price;
+    return (price);
   }
 
   // Proof of Provenance (PoP) section

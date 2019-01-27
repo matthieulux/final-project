@@ -26,21 +26,32 @@ contract TestDelivery {
     // test calling the function from an address that is not the buyer
     // test calling the function on an item not marked Shipped
 
+    
+
+  
+
 
   // The address of the delivery contract to be tested
   Delivery delivery = Delivery(DeployedAddresses.Delivery());
 
-  // test of the buying a bew basket
+  // Test #1: test that every modifier is working
+  function testVerifySenderMod() public {
+    address owner = delivery.getOwner();
+    Assert.notEqual(address(this), owner, "The sender is the owner");
+  }
+
+  // test of the buying a new basket
   function testUserCanBuyBasket() public {
     //address buyer = delivery.buyers(expectedBuyerId);
 
     //equal(buyer, buyer, "Buyer of the expected basket should be this contract");
   }
-
+  /*
   // Having serious troubles using the Assert.sol library for some reason so adding its equal() function in this contract, sorry
   function equal(address a, address b, string memory message) internal returns (bool result) {
     return AssertAddress.equal(a, b, message);
   }
+  */
 
   // Test for failing conditions in this contracts
     // test that every modifier is working
