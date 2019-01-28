@@ -4,7 +4,15 @@ Created by Matt Lux for the *ConsenSys Academy 2018*.
 
 This final project models a simple delivery system between a seller of organic vegetable box and buyers, with a proof of provenance for the buyer.
 
-Payment are accepted in Ether on the platform and automatically triggered upon receipt of the veggie basket.
+Payment are accepted in Ether on the platform from multiple buyers upon receipt of the veggie basket.
+
+Buttons are used to interact with the DApp on a single page:
+- View the basket (in the Javascript console for control check)
+- Buy the basket, advancing a tracker below
+- Ship the basket
+- Receive the basket which initiates in the background a verification of the proof of provenance (based on the farm name).
+
+The application shouod have different interfaces for sellers and buyers but is kept on one screen for this early prototpe, which really was about me understanding the underpinning of Ethereum, not creating a viable DApp.
 
 
 Personas of the DApp are:
@@ -51,7 +59,7 @@ Development was test-driven and can be evaluated running the command:
 truffle test
 ```
 
-As a new Ethereum developer, feedback is more than welcome!
+As a novice Ethereum developer, detailed feedback on the many mistakes I must have made is more than welcome!
 
 ## Future Evolution
 The following features were identified to reach a minimum viable product:

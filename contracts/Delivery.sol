@@ -5,18 +5,21 @@ contract Delivery {
   /* Owner of the contract */
   address owner;
   
+  /* Circuit breaker toggle */
+  bool private stopped = false;
+
   /* Name of the farm (used for the verification of the provenance)
 
-  Later on this ought to be replaced by a the public key of an RFID tag
-  attached to the basket and compare the hash of that key registered by
-  the seller against the hash of that same key retrieved by the buyer when scanning the basket.
+  Note: In a future version, this ought to be replaced by a the public key of an RFID tag
+  attached to the basket and compared to that key registered by
+  the seller against the same value retrieved by the buyer when scanning the basket.
   */
-  string farmName = "Matt's Organic Delivery Baskets";
+  string public farmName = "Matt's Organic Delivery Baskets";
 
   /* List of the buyers */
   address[16] public buyers;
 
-  /* variable to track the most recent sku # */
+  /* variable to track the most recent basket # */
   uint private skuCount;
 
   // public mapping that maps the SKU (a number) to a basket.
@@ -40,7 +43,7 @@ contract Delivery {
     State state; // status of delivery
     string longitude; // coordinates of the farm
     string latitude;
-    bytes32 provenance; //proof of provenance build from the longitude and latitude set by the seller
+    bytes32 provenance; //proof of provenance built from the farm name of the seller
     address payable seller;
     address payable buyer; 
   }
@@ -61,7 +64,7 @@ contract Delivery {
     _;
     uint _price = items[_sku].price;
     uint amountToRefund = msg.value - _price;    
-    //items[_sku].buyer.transfer(amountToRefund);
+    items[_sku].buyer.transfer(amountToRefund);
   }
 
   /* Modifiers called to verify different statuses of the basket */
@@ -75,6 +78,7 @@ contract Delivery {
        and set your skuCount to 0. */
     owner = msg.sender;
     skuCount = 0;
+    stopped = false;
   }
 
   function getOwner() public view returns(address) {
@@ -219,6 +223,35 @@ contract Delivery {
   // returns true if proof is stored
   function hasProof(uint sku, bytes32 proof) view public returns(bool) {
     return items[sku].provenance == proof;
+  }
+
+  /**
+  Circuit breaker design pattern
+   */
+
+  modifier isAdmin() {
+      require(msg.sender == owner);
+      _;
+  }
+
+  function toggleContractActive() isAdmin public {
+      // You can add an additional modifier that restricts stopping a contract to be based on another action, such as a vote of users
+      stopped = !stopped;
+  }
+
+  modifier stopInEmergency { if (!stopped) _; }
+  modifier onlyInEmergency { if (stopped) _; }
+
+  function deposit() stopInEmergency public returns(bool) {
+    
+    // no new basket can be bought
+    return stopped;
+  }
+
+  function withdraw() onlyInEmergency public returns(bool) {
+    
+    // no new basket can be sold
+    return stopped;
   }
 
 }

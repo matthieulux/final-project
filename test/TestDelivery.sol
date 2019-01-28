@@ -5,99 +5,39 @@ import "truffle/DeployedAddresses.sol";
 import "../contracts/Delivery.sol";
 
 contract TestDelivery {
-
-    // TESTS to implement for reference //
-    // Test for failing conditions in this contracts
-    // test that every modifier is working
-
-    // buyItem
-
-    // test for failure if user does not send enough funds
-    // test for purchasing an item that is not for Sale
-
-
-    // shipItem
-
-    // test for calls that are made by not the seller
-    // test for trying to ship an item that is not marked Sold
-
-    // receiveItem
-
-    // test calling the function from an address that is not the buyer
-    // test calling the function on an item not marked Shipped
-
-    
-
   
-
-
   // The address of the delivery contract to be tested
   Delivery delivery = Delivery(DeployedAddresses.Delivery());
 
-  // Test #1: test that every modifier is working
+  // test that the first modifier is working
   function testVerifySenderMod() public {
     address owner = delivery.getOwner();
     Assert.notEqual(address(this), owner, "The sender is the owner");
   }
 
-  // test of the buying a new basket
-  function testUserCanBuyBasket() public {
-    //address buyer = delivery.buyers(expectedBuyerId);
-
-    //equal(buyer, buyer, "Buyer of the expected basket should be this contract");
-  }
-  /*
-  // Having serious troubles using the Assert.sol library for some reason so adding its equal() function in this contract, sorry
-  function equal(address a, address b, string memory message) internal returns (bool result) {
-    return AssertAddress.equal(a, b, message);
-  }
-  */
-
-  // Test for failing conditions in this contracts
-    // test that every modifier is working
-
-  function testAddBasket() public {
-
-  }
-
-  // test for failure if user does not send enough funds
-  // test for purchasing an item that is not for Sale
-
-
-  // shipItem
-  function testShipBasket() public {
-
-  }
-  
-  
+  // test that the second modifier is working
+  function testVerifyCallerMod() public {
+    Assert.notEqual(address(this), msg.sender, "The sender is the caller");
+  }  
 
   // test for trying to ship an item that is not marked Sold
-  function testShipBasketNotSold() public{
+  function testBasketIsCorrectlyNotarized() public{
+    uint basketID = 0;
+    delivery.addBasket("test basket", 10);
+    bytes32 proof = delivery.proofFor(basketID);
+    bytes32 referenceProof = sha256(abi.encodePacked(delivery.farmName));
 
-  }
-  
-  function testFetchBasket() public {
-
-  }
-
-  // test for calls that are made by not the seller
-  function isSellerCalling() public {
-    address caller = address(this);
-
-    Assert.equal(caller, caller, "Buyer of the expected basket should be this contract");
-  }
-  
-  // test calling the function from an address that is not the buyer
-  function TestIsBuyerCalling() public {
-    address caller = address(this);
-
-    Assert.equal(caller, caller, "Buyer of the expected basket should be this contract");
+    Assert.equal(proof, referenceProof, "The basket has been notarized with an incorrect farm name");
   }
 
-  // test calling the function on a basket not marked Shipped
-  // This is to make sure that no basket can be received if the haven't been shipped first
-  function testReceiveBasketOnNonShippedBasket() public {
+  /**
+  Test Section of the circuit breaker
+  */
+  function testCircuitBreaker() public {
+    delivery.toggleContractActive();
+    bool status = delivery.deposit();
 
+    Assert.equal(status, true, "Circuit breaker should be activated");
   }
 
   // The id of the buyer that will be used for testing
@@ -107,3 +47,4 @@ contract TestDelivery {
   address expectedSeller = address(this);
   
 }
+
